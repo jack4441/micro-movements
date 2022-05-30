@@ -18,6 +18,7 @@ public class RequestMovementsDto implements Serializable {
 		return Movements.builder()
 				.id(this.movements.getId())
 				.idcliente(this.movements.getIdcliente())
+				.iddetail(this.movements.getIddetail())
 				.idproduct(this.movements.getIdproduct())
 				.bank_account(this.movements.getBank_account())
 				.fullname(this.movements.getFullname())
@@ -34,6 +35,8 @@ public class RequestMovementsDto implements Serializable {
 	public CashHistory toCashHistory() {
 		return CashHistory.builder()
 				.idcliente(this.movements.getIdcliente())
+				.iddetail(this.movements.getIddetail())
+				.idproduct(this.movements.getIdproduct())
 				.bank_account(this.movements.getBank_account())
 				.fullname(this.movements.getFullname())
 				.credit_card(this.movements.getCredit_card())

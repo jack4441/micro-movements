@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nttdata.bootcamp.movements.entity.CashHistory;
 import com.nttdata.bootcamp.movements.entity.Movements;
 import com.nttdata.bootcamp.movements.entity.RequestMovementsDto;
 import com.nttdata.bootcamp.movements.entity.ResponseDelete;
@@ -67,6 +68,18 @@ public class ControllerMovements {
 	public Flux<Movements> movementsFindAllCommissions(@PathVariable String idproduct, @PathVariable String initdate, @PathVariable String enddate)
 	{
 		return service.movementsFindAllCommissions(idproduct, initdate, enddate);
+	}
+	
+	@GetMapping(path = "/getaveragebalance/{idclient}")
+	public Flux<CashHistory> movementsFindAllAverageBalanceCreditBankAccountsPerMonth(@PathVariable String idclient)
+	{
+		return service.movementsFindAllAverageBalanceCreditBankAccountsPerMonth(idclient);
+	}
+	
+	@GetMapping(path = "/gettenmovements/{idclient}")
+	public Flux<Movements> findTenMovementsDebCred(@PathVariable String idclient)
+	{
+		return service.findTenMovementsDebCred(idclient);
 	}
 	
 }

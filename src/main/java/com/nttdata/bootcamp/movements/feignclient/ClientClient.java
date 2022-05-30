@@ -17,8 +17,8 @@ public interface ClientClient {
 	@GetMapping(path = "/client/v1/findclient/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	RequestClientDto getAll(@PathVariable String id);
 	
-	@GetMapping(path = "/client/v1/getReceiver/{bank_account}", produces = MediaType.APPLICATION_JSON_VALUE)
-	RequestClientDto getReceiver(@PathVariable String bank_account);
+	@GetMapping(path = "/client/v1/getReceiver/{destination}", produces = MediaType.APPLICATION_JSON_VALUE)
+	RequestClientDto getReceiver(@PathVariable String destination);
 	
 	@PutMapping(path = "/client/v1/updateclient", produces = MediaType.APPLICATION_JSON_VALUE)
 	RequestClientDto update(@RequestBody RequestClientDto body);
