@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import  static org.mockito.Mockito.when;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,7 @@ class ApplicationTests {
 	ServiceMovements services;
 	
 	@Test
-	//1.- Registrar un depósito a una misma cuenta bancaria.
+	@DisplayName("Registrar un depósito a una misma cuenta bancaria.")
 	public void registerMovementsInTheSameBankAccount() {
 		RequestMovementsDto movement = new RequestMovementsDto();
 		var movem = Movements.builder()
