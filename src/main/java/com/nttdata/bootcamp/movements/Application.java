@@ -21,9 +21,12 @@ import com.nttdata.bootcamp.movements.entity.RequestClientDto;
 import com.nttdata.bootcamp.movements.entity.RequestMovementsDto;
 import com.nttdata.bootcamp.movements.feignclient.ClientClient;
 import com.nttdata.bootcamp.movements.service.IServiceMovements;
+import com.nttdata.bootcamp.movements.service.ServiceMovements;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @EnableFeignClients
 @EnableEurekaClient
 @SpringBootApplication
@@ -45,6 +48,8 @@ public class Application {
 		@KafkaListener(topics={"client"}, groupId="spring-boot-kafka-client")
 		public void consume(String message) throws JsonMappingException, JsonProcessingException
 		{
+			log.info("message recibido: " + message);
+
 			MessageTransactWallet messageTransact = Util.objectMapper.readValue(message, MessageTransactWallet.class);
 			RequestClientDto response = clientClient.getReceiver(messageTransact.getIddetail());
 			ProductDto product = response.getDetail()
@@ -64,6 +69,12 @@ public class Application {
 					.date(new SimpleDateFormat("dd-MM-yyyy").format(new Date()))
 					.build());
 			movementsdao.movementsSave(requestMovements).block();
+			var receiver = clientClient.getReceiver(messageTransact.getDestination());
+			receiver.getDetail().forEach(prod-> {
+				if(prod.getBank_account().equals(messageTransact.getDestination())&&prod.getCredit_card().equals("-"))
+					prod.setCash(prod.getCash()+messageTransact.getAmount());
+			});
+			clientClient.update(receiver);
 			messageTransact.setStatus("Success");
 			template.send("transferWallet", messageTransact.toString());
 		}

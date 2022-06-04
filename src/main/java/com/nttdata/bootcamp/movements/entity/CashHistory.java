@@ -299,7 +299,7 @@ public class CashHistory implements Serializable {
 		//Si es un pago de un crédito con destino a un tercero mediante una tarjeta de débito
 		if(this.type.equals("PCTD"))
 			cli_receiver.getDetail().stream().forEach(value-> {
-				if(value.getIddetail().equals(this.getDestination()))
+				if(value.getIddetail().equals(this.getDestination())||value.getBank_account().equals(this.getDestination()))
 				{
 					this.current_balance = ((value.getCredit()-this.getAmount())-this.amount_commission);
 					this.time=new SimpleDateFormat("HH:mm:ss").format(new Date());
