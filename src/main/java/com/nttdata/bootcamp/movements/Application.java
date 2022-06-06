@@ -45,38 +45,71 @@ public class Application {
 	@Component
 	class Consumer{
 		
-		@KafkaListener(topics={"client"}, groupId="spring-boot-kafka-client")
+		@KafkaListener(topics={"client"}, groupId="spring-boot-kafka-movements")
 		public void consume(String message) throws JsonMappingException, JsonProcessingException
 		{
 			log.info("message recibido: " + message);
 
 			MessageTransactWallet messageTransact = Util.objectMapper.readValue(message, MessageTransactWallet.class);
-			RequestClientDto response = clientClient.getReceiver(messageTransact.getIddetail());
-			ProductDto product = response.getDetail()
-					.stream()
-					.filter(prod-> prod.getIddetail().equals(messageTransact.getIddetail())).findFirst().get();
-			RequestMovementsDto requestMovements = new RequestMovementsDto();
-			requestMovements.setMovements(Movements.builder()
-					.idcliente(response.getId())
-					.fullname(response.getName()+" "+response.getLastname())
-					.iddetail(messageTransact.getIddetail())
-					.idproduct(product.getId())
-					.bank_account("-")
-					.credit_card(product.getCredit_card())
-					.type("PCTD")
-					.amount(messageTransact.getAmount())
-					.destination(messageTransact.getDestination())
-					.date(new SimpleDateFormat("dd-MM-yyyy").format(new Date()))
-					.build());
-			movementsdao.movementsSave(requestMovements).block();
-			var receiver = clientClient.getReceiver(messageTransact.getDestination());
-			receiver.getDetail().forEach(prod-> {
-				if(prod.getBank_account().equals(messageTransact.getDestination())&&prod.getCredit_card().equals("-"))
-					prod.setCash(prod.getCash()+messageTransact.getAmount());
-			});
-			clientClient.update(receiver);
-			messageTransact.setStatus("Success");
-			template.send("transferWallet", messageTransact.toString());
+			if(messageTransact.getStatus().equals("Process"))
+			{
+				RequestClientDto response = clientClient.getReceiver(messageTransact.getIddetail());
+				ProductDto product = response.getDetail()
+						.stream()
+						.filter(prod-> prod.getIddetail().equals(messageTransact.getIddetail())).findFirst().get();
+				RequestMovementsDto requestMovements = new RequestMovementsDto();
+				requestMovements.setMovements(Movements.builder()
+						.idcliente(response.getId())
+						.fullname(response.getName()+" "+response.getLastname())
+						.iddetail(messageTransact.getIddetail())
+						.idproduct(product.getId())
+						.bank_account("-")
+						.credit_card(product.getCredit_card())
+						.type("PCTD")
+						.amount(messageTransact.getAmount())
+						.destination(messageTransact.getDestination())
+						.date(new SimpleDateFormat("dd-MM-yyyy").format(new Date()))
+						.build());
+				movementsdao.movementsSave(requestMovements).block();
+				var receiver = clientClient.getReceiver(messageTransact.getDestination());
+				receiver.getDetail().forEach(prod-> {
+					if(prod.getBank_account().equals(messageTransact.getDestination())&&prod.getCredit_card().equals("-"))
+						prod.setCash(prod.getCash()+messageTransact.getAmount());
+				});
+				clientClient.update(receiver);
+				messageTransact.setStatus("Success");
+				template.send("transferWallet", messageTransact.toString());
+			}
+			if(messageTransact.getStatus().equals("ProcessBootcoin"))
+			{
+				RequestClientDto response = clientClient.getReceiver(messageTransact.getIddetail());
+				ProductDto product = response.getDetail()
+						.stream()
+						.filter(prod-> prod.getIddetail().equals(messageTransact.getIddetail())).findFirst().get();
+				RequestMovementsDto requestMovements = new RequestMovementsDto();
+				requestMovements.setMovements(Movements.builder()
+						.idcliente(response.getId())
+						.fullname(response.getName()+" "+response.getLastname())
+						.iddetail(messageTransact.getIddetail())
+						.idproduct(product.getId())
+						.bank_account("-")
+						.credit_card(product.getCredit_card())
+						.type("PCTD")
+						.amount(messageTransact.getAmount())
+						.destination(messageTransact.getDestination())
+						.date(new SimpleDateFormat("dd-MM-yyyy").format(new Date()))
+						.build());
+				movementsdao.movementsSave(requestMovements).block();
+				var receiver = clientClient.getReceiver(messageTransact.getDestination());
+				receiver.getDetail().forEach(prod-> {
+					if(prod.getBank_account().equals(messageTransact.getDestination())&&prod.getCredit_card().equals("-"))
+						prod.setCash(prod.getCash()+messageTransact.getAmount());
+				});
+				clientClient.update(receiver);
+				messageTransact.setStatus("Success");
+				template.send("transferBootcoin", messageTransact.toString());
+			}
+
 		}
 	}
 	
